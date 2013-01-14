@@ -3,7 +3,7 @@ var _url = require('url');
 var _screenResolutionX;
 var _screenResolutionY;
 var _href;
-
+var _path;
 //Constructor
 
 //the path would be ?screenResolutionX=1240&screenResolutionY=800
@@ -14,10 +14,15 @@ var URLParser = function(path)
 
 function parseQueryString(path)
 {
-	_url.parse(path, parseQueryString=false);
-	_href = _url.href;
-	_screenResolutionX = 1240; 
-	_screenResolutionY = 1000;
+	_path = path;
+	
+	var pathURLParsed = _url.parse(_path,true);
+	var urlParams = pathURLParsed.query;
+	
+	_href = pathURLParsed.href;
+	
+	_screenResolutionX = Number(urlParams.screenResolutionX); 
+	_screenResolutionY = Number(urlParams.screenResolutionY);
 }
 
 //so this class should just have getter methods so that the context can
@@ -26,7 +31,7 @@ function parseQueryString(path)
 //method accessor?
 URLParser.prototype.getURL = function()
 {
-	return "bean";
+	return _path;
 };
 
 URLParser.prototype.getScreenResolutionX = function()

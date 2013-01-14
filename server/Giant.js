@@ -11,7 +11,11 @@ var http = require('http');
 parseURL();
 
 //STEP 2 ASSIGN URL TO MODEL
-//STEP 3 WORK OUT GRID 
+
+//STEP 3 WORK OUT GRID
+//At this step we should have a working version just with boxes on a javascript html5 page
+
+
 //STEP 4 ASSIGN DOTS
 //STEP 5 WORK OUT WHERE TO PLACE BOXES
 //STEP 6 ASSIGN BOXES
@@ -25,8 +29,12 @@ function parseURL()
 	//configuration.getScreenResolutionX;
 	//configuration.getScreenResolutionY;
 	//configuration.getXYCoors;
-	//should bring back data on 
+	//should bring back data on
+
+	constructGrid();
 }
+
+
 
 //FROm Creating the grid the output you need it x and Y of each piece of the grid
 //and also the height and width of each piece?
