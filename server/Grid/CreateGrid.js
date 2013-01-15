@@ -20,6 +20,9 @@ var _gridItems = new Array();
 
 var CreateGrid = function(width, height)
 {
+	_width = width;
+	_height = height;
+	
     var EVEN_ROW = "evenRow";
     var ODD_ROW = "oddRow";
 
