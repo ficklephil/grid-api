@@ -11,12 +11,9 @@ var GridItem = require("./GridItem");
 var CreatePattern = require("./CreatePattern");
 var CreateRows = require("./CreateRows");
 
-
-
 var _width;
 var _height;
 var _gridItems = new Array();
-
 
 var CreateGrid = function(width, height)
 {
@@ -44,7 +41,7 @@ var CreateGrid = function(width, height)
     var INVERSE_NUMBER = -1;
     var direction = -1;
     var segmentDirection = -1;
-    var startXCoor;
+    var startXCoor = 0;
 
     var midRow = maxRow / 2;
 
@@ -93,6 +90,8 @@ _gridItems = [gridItem,gridItem2,gridItem3];     */
         if(segmentDirection == INVERSE_NUMBER)//going backwards
         {
             startXCoor = width - (width - (maxColumn * PROPERTY_BOX_GUIDE_HEIGHT))/2;
+			console.log("startXCoor" + startXCoor);
+			
             direction = 1;
             gridItemDirection = -1;
 
@@ -120,14 +119,13 @@ _gridItems = [gridItem,gridItem2,gridItem3];     */
 
             rowIndex = (gridItemDirection == UPWARDS_MOVEMENT)? 0 : midRow;//Max row height;
 
-
             //BRAND NEW PLZ CHECK
 
             for(gridIndex = 0; gridIndex <= midRow; gridIndex++)
             {
                 gridItem = new GridItem();
                 gridItem.setId(gridItemIndex);
-                gridItem.setRow(rowIndex);
+                gridItem.setRow(Math.round(rowIndex));
                 gridItem.setColumn(columnIndex);
 
                 //if the second row and it's 0 do not go down on the
@@ -138,7 +136,7 @@ _gridItems = [gridItem,gridItem2,gridItem3];     */
                 }
 
                 //gridItemYCoor += gridItemYDirection;
-                gridItem.setY(gridItemYCoor);
+                gridItem.setY(Math.round(gridItemYCoor));
 
                 if(patternIndex < pattern.length &&
                     pattern[patternIndex].column == gridItem.getColumn() &&
@@ -152,10 +150,11 @@ _gridItems = [gridItem,gridItem2,gridItem3];     */
 
                 //previous width + this width and times this by segment direction
 
-
+				//so over here X position is calulated 
+				
                 gridItemX = ((PROPERTY_BOX_GUIDE_WIDTH * columnIndex) + 0) * segmentDirection;
-
-                gridItem.setX(gridItemX + startXCoor);
+				
+                gridItem.setX(Math.round(gridItemX + startXCoor));
                 //gridItem.width = gridItemWidth + rows[rowIndex].offset;
 
 

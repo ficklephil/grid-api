@@ -92,11 +92,11 @@ function createResponse(gridItemResposonse)
 
 			for(i = 0; i < gridItemResposonse.length; i++)
 			{
-				response.write("{ Id:" + gridItemResposonse[i].getId() +
+				response.write("{Id:" + gridItemResposonse[i].getId() +
 							   " Row:" + gridItemResposonse[i].getRow() +
 							   " Column:" + gridItemResposonse[i].getColumn() +
 							   " X:" + gridItemResposonse[i].getX() +
-							   " Y:" + gridItemResposonse[i].getY()+ " }"
+							   " Y:" + gridItemResposonse[i].getY()+ "}"
 							  );
 			}
 
