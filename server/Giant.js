@@ -84,23 +84,76 @@ function (req, res)
 
 console.log("Service running http://127.0.0.1:1337/"); */
 
+function addRequestData(response)
+{
+	response.write('"request" :{');
+	response.write('"items_required" : "15"');
+	response.write('},');
+}
+
+function addResponseData(response)
+{
+	response.write('"response" : {');
+	response.write('"link" : "http://www.thenhome.com",');
+	response.write('"response_code" : "100"');
+	response.write('},');
+}
+
 function createResponse(gridItemResposonse)
 {
 	var server = http.createServer(function(request, response) {
+			
+			
+			
+			//PPrint out request that has come in
+			
+			
+			//Write JSON
+			response.writeHead(200, { 'Content-Type': 'application/json' });
 
-		response.writeHead(200, {'Content-Type': 'text/plain'});
-
+			//open loaded tag
+			response.write('loaded({');
+			
+			addRequestData(response);
+			addResponseData(response);
+			
+			//Opening Tag for the document
+			
+			
+			//Opening Tag for the response
+			
+			
+			response.write('"grid_pattern" : [ ');
 			for(i = 0; i < gridItemResposonse.length; i++)
 			{
-				response.write("{Id:" + gridItemResposonse[i].getId() +
-							   " Row:" + gridItemResposonse[i].getRow() +
-							   " Column:" + gridItemResposonse[i].getColumn() +
-							   " X:" + gridItemResposonse[i].getX() +
-							   " Y:" + gridItemResposonse[i].getY()+ "}"
-							  );
+				
+			
+				var responseObj = new Object();
+				
+				responseObj.id = gridItemResposonse[i].getId();
+				responseObj.row = gridItemResposonse[i].getRow();
+				responseObj.column = gridItemResposonse[i].getColumn();
+				responseObj.x = gridItemResposonse[i].getX();
+				responseObj.y = gridItemResposonse[i].getY();
+			
+				response.write(JSON.stringify(responseObj));
+				
+				//The last one does not need a comma
+				if(!(i == gridItemResposonse.length - 1))
+				{
+					response.write(',');
+				}
 			}
-
+			
+			response.write('],');
+			
+			response.write('"status_code" : "200"');
+			
+			//Close Loaded tag
+			response.write('})');
+			
 			response.end();
+			
 	}).listen(1337, '127.0.0.1');
 	
 	console.log("Service Running at http://127.0.0.1:1337/ Grid API Version 0.2");

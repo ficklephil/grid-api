@@ -56,11 +56,13 @@ describe('create-grid', function()
 		//for 0-4 row number should increase
 		var rowType;
 		
-		for(columnIndex = 0; columnIndex < maxColumn; columnIndex++)
+		for(columnIndex = 0; columnIndex < Math.round(maxColumn); columnIndex++)
 		{
 			//for EVEN numbers ie.0,2,4,6 the row number should go up
 			//for ODD numbers ie. 1,3,5,7 the row number should go down
 			rowType = (columnIndex % 2)? EVEN_ROW : ODD_ROW;
+			
+			console.log(rowType);
 			
 			if(rowType == EVEN_ROW)
 			{
