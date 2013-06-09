@@ -41,11 +41,45 @@ function testWithRequestInJson(){
 //ALSO REMEMBER TO TAKE LOADED OUT OF THE REQUEST
 function makeNestoriaRequest()
 {
+    //Use a search with Lat Lng bounds and take these
+    //and then see the x and y's of divs
     request({url:'http://api.nestoria.co.uk/api?country=uk&page=1&pretty=1&action=search_listings&place_name=hounslow&encoding=json&listing_type=buy&number_of_results=15&property_type=all&bedroom_min=0&bedroom_max=100&price_min=0&price_max=25000000&updated_min=1341378000', json:true}, function (error, response, body) {
   if (!error && response.statusCode == 200) {
     
-	console.log(body.request.country);
+    //console.log(body.response.listings);
+    //console.log(body.response.listings.length);
+
+
+
+
+      var listings = body.response.listings;
+      for (var i = 0; i < listings.length;i++ )
+      {
+         // console.log(listings[i].longitude);
+          //console.log(listings[i].latitude);
+
+          listings[i].test1 = "test1";
+          listings[i].test2 = "test2";
+
+
+      }
+
+      //you do need to print print the json, something is going wrong !
+      body = JSON.stringify(body);
+      pullOutLatLng(body);
     }
+
+    //should be outputted onto the json
+    //console.log(body);
+
+
+//
+//        Loop through each of the values, extract the stuff you need,
+//            and print out onto the json.
+//            Send the values to a div to Pixel Method.
+//            Attached the output back onto thing
+
+
 })
 }
 
@@ -72,9 +106,8 @@ function createResponse(output)
 			response.writeHead(200, { 'Content-Type': 'application/json' });
 
 			//open loaded tag
-
 			response.write('hello');
-			response.write(String(output));
+			response.write(output);
 			
 			//response.write('"status_code" : "200"');
 			
