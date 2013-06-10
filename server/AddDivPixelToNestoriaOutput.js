@@ -41,6 +41,20 @@ function testWithRequestInJson(){
 //ALSO REMEMBER TO TAKE LOADED OUT OF THE REQUEST
 function makeNestoriaRequest()
 {
+    var item_lat = 51.490994;
+    var item_lng = -0.371348;
+
+    var screenResolutionX = 1000;
+    var screenResolutionY = 700;
+
+    //sw
+    var lat_lo = 51.430994;
+    var lng_lo = -0.488156;
+
+    //ne
+    var lat_hi = 51.499972;
+    var lng_hi = -0.271348;
+
     //Use a search with Lat Lng bounds and take these
     //and then see the x and y's of divs
     request({url:'http://api.nestoria.co.uk/api?country=uk&page=1&pretty=1&action=search_listings&place_name=hounslow&encoding=json&listing_type=buy&number_of_results=15&property_type=all&bedroom_min=0&bedroom_max=100&price_min=0&price_max=25000000&updated_min=1341378000', json:true}, function (error, response, body) {
@@ -48,9 +62,10 @@ function makeNestoriaRequest()
     
     //console.log(body.response.listings);
     //console.log(body.response.listings.length);
+       //51.430994,-0.488156,51.499972,-0.271348
 
-
-
+      //Returns a string of the form "lat_lo,lng_lo,lat_hi,lng_hi" for this bounds, where "lo" corresponds to the
+      // southwest corner of the bounding box, while "hi" corresponds to the northeast corner of that box.
 
       var listings = body.response.listings;
       for (var i = 0; i < listings.length;i++ )
@@ -58,16 +73,21 @@ function makeNestoriaRequest()
          // console.log(listings[i].longitude);
           //console.log(listings[i].latitude);
 
-          listings[i].test1 = "test1";
-          listings[i].test2 = "test2";
+          item_lat = listings[i].latitude;
+          item_lng = listings[i].longitude;
 
+          convertCoordToDivPixel(screenResolutionX,screenResolutionY,item_lat,item_lng,lat_lo,lng_lo,lat_hi,lng_hi);
 
-      }
+          listings[i].itemMarkerX = getDivPixelLat();
+          listings[i].itemMarkerY = getDivPixelLng();
+       }
 
       //you do need to print print the json, something is going wrong !
       body = JSON.stringify(body);
       pullOutLatLng(body);
-    }
+
+
+  }
 
     //should be outputted onto the json
     //console.log(body);
@@ -81,6 +101,50 @@ function makeNestoriaRequest()
 
 
 })
+}
+
+var _divPixelLat;
+var _divPixelLng;
+
+function convertCoordToDivPixel(screenResolutionX,screenResolutionY,item_lat,item_lng,lat_lo,lng_lo,lat_hi,lng_hi)
+{
+    //var screenResolutionX = 1000;
+    //var screenResolutionY = 700;
+
+    //var item_lat = 51.490994;
+    //var item_lng = -0.371348;
+
+    var differenceBetweenLat = lat_hi - lat_lo;//lat
+    var differenceBetweenLng = lng_hi - lng_lo;//lng
+
+    console.log('Difference between Lat : ' + differenceBetweenLat);
+    console.log('Difference between Lng : ' + differenceBetweenLng);
+
+    var itemLatDifferenceFromBound = item_lat - lat_lo;
+    var itemLngDifferenceFromBound = item_lng - lng_lo;
+
+    console.log('itemLatDifferenceFromBound' + itemLatDifferenceFromBound);
+    console.log('itemLngDifferenceFromBound' + itemLngDifferenceFromBound);
+
+
+    var divPixelLat = (screenResolutionX / differenceBetweenLat) * itemLatDifferenceFromBound;
+    var divPixelLng = (screenResolutionY / differenceBetweenLng) * itemLngDifferenceFromBound;
+
+    console.log(divPixelLat);
+    console.log(divPixelLng);
+
+    _divPixelLat = divPixelLat;
+    _divPixelLng = divPixelLng;
+}
+
+function getDivPixelLat()
+{
+    return _divPixelLat;
+}
+
+function getDivPixelLng()
+{
+    return _divPixelLng;
 }
 
 function pullOutLatLng(body)
