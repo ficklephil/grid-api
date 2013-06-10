@@ -1,0 +1,4 @@
+input in 
+
+Lat Lng SE and NW Lat Lng, from this also input point on map, to find it's x and y
+and screen res.

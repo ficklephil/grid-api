@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map-canvas { height: 100% }
+    </style>
+	
+	<style type="text/css" >
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map-canvas { height: 100% }
+    </style>
+	
+	<link rel="stylesheet" type="text/css" href="spike_style.css" />
+	
+    <script type="text/javascript"
+      src="http://maps.googleapis.com/maps/api/js?key=AIzaSyA5Zhn0d70pprD2K2ogELhYwmJy_N32le4&sensor=false">
+    </script>
+    <script type="text/javascript">
+	
+		window.onload = init;
+		
+		function init() {
+			//var canvas = document.getElementById("myCanvas");
+			//var ctx = canvas.getContext("2d");
+		   
+			//ctx.fillRect(55,25,75,75);
+			//ctx.fillRect(375,125,75,75);
+		}
+			
+			var map;
+			
+		function initialize() {
+            var lat = 51.46549649642391;
+            var lng = -0.37975222192383473;
+
+            var mapOptions = {
+			  center: new google.maps.LatLng(lat, lng),
+			  zoom: 13,
+			  sensors:false,
+			  mapTypeId: google.maps.MapTypeId.ROADMAP
+			};
+			map = new google.maps.Map(document.getElementById("map-canvas"),
+				mapOptions);
+
+            google.maps.event.addListener(map, 'idle', function(){
+
+                //perhaps use .toUrlValue() to get lat lng values as url
+                //lat_lo,lng_lo,lat_hi,lng_hi
+                //51.430994,-0.488156,51.499972,-0.271348
+                var bounds = map.getBounds().toUrlValue();
+                console.log(bounds);
+                alert(bounds);
+
+
+            });
+
+			placeDotOnMapAtXY();
+		  }
+		  google.maps.event.addDomListener(window, 'load', initialize);
+
+        function placeDotOnMapAtXY(){
+			//mark a point
+			var lat = 51.448979;
+			var lng = -0.334396;
+			if(map)
+			{
+				var overlay = new google.maps.OverlayView();
+					overlay.draw = function() {};
+					overlay.setMap(map);
+
+				
+				//if(map)
+				//{
+				//var proj = map.getProjection();
+				
+				var latLng = new google.maps.LatLng(40.712216,-74.22655)
+				//var pointCenter = proj.fromLatLngToDivPixel(latLng);
+				
+				//alert('point' + overlay.getProjection());
+				var point = overlay.getProjection().fromLatLngToContainerPixel(latLng);
+			}
+			//alert(pointCenter);
+			//}
+			
+			//so you want the x and y coordinate pixel of the marker point,
+			//as you want to send this to the service.
+			
+			//you also want the x and y coordinate pixel of the marker point so 
+			//that you can draw a div on that point and therefore may it overable
+			
+			//var divPixelCentre = google.maps.fromLatLngToDivPixel(center);
+		
+			//alert(divPixelCentre);
+		
+		//get the x and y of that point
+		//put a dot on the map
+		
+		//link the dot to the image of the place
+		}
+		
+		
+	  
+    </script>
+  </head>
+  <body>
+  <!-- <div style="position:absolute; z-index:1;">
+	<canvas id="myCanvas" width="500" height="500"></canvas>
+  </div> -->
+  <div>hello</div>
+  <div style="z-index:1; position:absolute; top:40px;left:200px;">
+	<div class="item-container"><a href="http://www.google.com">link</a></div>
+	
+  </div>
+  <div style="z-index:1; position:absolute; top:170px;left:200px;">dot</div>
+  
+  <div style="z-index:1; position:absolute; top:50px;left:400px;">
+  
+  
+	<div class="item-container">hi</div>
+  </div>
+  <div style="z-index:0; position:relative; top:0;" id="map-canvas"/>
+
+  
+	
+	
+	<div style="height:100px;">
+		hello
+	</div>
+   
+	
+  </body>
+</html>

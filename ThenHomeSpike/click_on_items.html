@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map-canvas { height: 100% }
+    </style>
+    <script type="text/javascript"
+      src="http://maps.googleapis.com/maps/api/js?key=AIzaSyA5Zhn0d70pprD2K2ogELhYwmJy_N32le4&sensor=false">
+    </script>
+    <script type="text/javascript">
+	
+		window.onload = init;
+		
+		var linkText="http://stackoverflow.com";
+		var linkX=50;
+		var linkY=150;
+		var linkHeight=10;
+		var linkWidth;
+		var inLink = false;
+		
+		function init() {
+			var canvas = document.getElementById("myCanvas");
+			var ctx = canvas.getContext("2d");
+		   
+			ctx.fillRect(55,25,75,75);
+			ctx.fillRect(375,125,75,75);
+			
+			 //draw the link
+			ctx.font='10px sans-serif';
+			ctx.fillStyle = "#0000ff";
+			ctx.fillText(linkText,linkX,linkY);
+			linkWidth=ctx.measureText(linkText).width;
+			
+			//add mouse listeners
+			//canvas.addEventListener("mousemove", on_mousemove, false);
+			canvas.addEventListener("click", on_click, false);
+		}
+			
+		//check if the mouse is over the link and change cursor style
+		function on_mousemove (ev) {
+		  alert('on_mousemove');
+		}
+
+		//if the link has been clicked, go to link
+		function on_click(e) {
+		  alert('on_click');
+		}	
+			
+			
+		function initialize() {
+			var mapOptions = {
+			  center: new google.maps.LatLng(51.5171, 0.1062),
+			  zoom: 8,
+			  sensors:false,
+			  mapTypeId: google.maps.MapTypeId.ROADMAP
+			};
+			var map = new google.maps.Map(document.getElementById("map-canvas"),
+				mapOptions);
+		  }
+		  google.maps.event.addDomListener(window, 'load', initialize);
+		
+	  
+    </script>
+  </head>
+  <body>
+  
+  <div>hello</div>
+  <div style="position:absolute; z-index:1;">
+	<canvas id="myCanvas" width="500" height="500"></canvas>
+  </div>
+  
+  
+  <div style="z-index:0; position:relative; top:0;" id="map-canvas"/>
+
+  
+		hello	
+		
+	<div style="height:100px;">
+		hello
+	</div>
+   
+	
+	
+  </body>
+</html>
