@@ -78,8 +78,8 @@ function makeNestoriaRequest()
 
           convertCoordToDivPixel(screenResolutionX,screenResolutionY,item_lat,item_lng,lat_lo,lng_lo,lat_hi,lng_hi);
 
-          listings[i].itemMarkerX = getDivPixelLat();
-          listings[i].itemMarkerY = getDivPixelLng();
+          listings[i].itemMarkerX = Math.round(getDivPixelLat());
+          listings[i].itemMarkerY = Math.round(getDivPixelLng());
        }
 
       //you do need to print print the json, something is going wrong !
@@ -170,7 +170,6 @@ function createResponse(output)
 			response.writeHead(200, { 'Content-Type': 'application/json' });
 
 			//open loaded tag
-			response.write('hello');
 			response.write(output);
 			
 			//response.write('"status_code" : "200"');
