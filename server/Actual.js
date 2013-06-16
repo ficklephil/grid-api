@@ -7,16 +7,58 @@
 //PS YOU WILL NEED https://github.com/mikeal/request.git which is a HTTP Request libary for Node so 
 //that it will make dev faster use npm install request
 
+URLParser = require('./QueryString/URLParser');
+
 var http = require('http');
 var request = require('request');
+var url = require('url');
 
+listen();
+
+//parseQueryString();
+//testWithoutLoaded();
+//testWithRequestInJson();
 //makeNestoriaRequest();
-testWithoutLoaded();
-testWithRequestInJson();
-makeNestoriaRequest();
+
 //so I think it's the loaded in the front of it as it works with other api when you try and pull stuff off the json too.
 //ie. works with http://dev.virtualearth.net/REST/v1/Locations/UK/postalCode?includeNeighborhood=includeNeighborhood&maxResults=maxResults&key=BingMapsKey
 //json must seperate using " and not '       ie. "bedroom_max" : "100"
+
+//load in the URL that it is sent
+//pick off the params from it
+//we'll need to add the screen resolution to the response
+
+var screenResolutionX;
+var screenResolutionY;
+var placeName;
+var storeBody;
+
+//request needs to be http://127.0.0.1:1337/?screenResolutionX=19393&screenResolutionY=43110&placeName=hounslow
+
+function parseParams(request,callback){
+
+    var queryData = url.parse(request.url, true).query;
+
+    var paramsObj = new Object();
+    paramsObj.screenResolutionX = queryData.screenResolutionX;
+    paramsObj.screenResolutionY = queryData.screenResolutionY;
+    paramsObj.placeName = queryData.placeName;
+
+    callback(paramsObj);
+}
+
+//function parseRequest(request)
+//{
+//    console.log('parseRequest');
+//
+//    var queryData = url.parse(request.url, true).query;
+//
+//    screenResolutionX = queryData.screenResolutionX;
+//    screenResolutionY = queryData.screenResolutionY;
+//    placeName = queryData.placeName;
+//
+//    makeNestoriaRequest(placeName, screenResolutionX, screenResolutionY);
+//}
 
 //WORKS
 function testWithoutLoaded(){
@@ -39,14 +81,15 @@ function testWithRequestInJson(){
 //AWESOME WORKS
 //REMEMBER THAT WE'RE SET JSON to TRUE in request
 //ALSO REMEMBER TO TAKE LOADED OUT OF THE REQUEST
-function makeNestoriaRequest()
-{
+function makeNestoriaRequest(params, callbackWithNestoriaJson){
+    console.log('makeNestoriaRequest with ' + params.placeName + params.screenResolutionX + params.screenResolutionY);
+
     var item_lat = 51.490994;
     var item_lng = -0.371348;
 
-    var screenResolutionX = 1000;
-    var screenResolutionY = 700;
-
+    var screenResolutionX = params.screenResolutionX;
+    var screenResolutionY = params.screenResolutionY;
+    var placeName = params.placeName.toString();
     //sw
     var lat_lo = 51.430994;
     var lng_lo = -0.488156;
@@ -57,7 +100,7 @@ function makeNestoriaRequest()
 
     //Use a search with Lat Lng bounds and take these
     //and then see the x and y's of divs
-    request({url:'http://api.nestoria.co.uk/api?country=uk&page=1&pretty=1&action=search_listings&place_name=hounslow&encoding=json&listing_type=buy&number_of_results=15&property_type=all&bedroom_min=0&bedroom_max=100&price_min=0&price_max=25000000&updated_min=1341378000', json:true}, function (error, response, body) {
+    request({url:'http://api.nestoria.co.uk/api?country=uk&page=1&pretty=1&action=search_listings&place_name='+placeName+'&encoding=json&listing_type=buy&number_of_results=15&property_type=all&bedroom_min=0&bedroom_max=100&price_min=0&price_max=25000000&updated_min=1341378000', json:true}, function (error, response, body) {
   if (!error && response.statusCode == 200) {
     
     //console.log(body.response.listings);
@@ -66,6 +109,11 @@ function makeNestoriaRequest()
 
       //Returns a string of the form "lat_lo,lng_lo,lat_hi,lng_hi" for this bounds, where "lo" corresponds to the
       // southwest corner of the bounding box, while "hi" corresponds to the northeast corner of that box.
+
+      var request = body.request;
+      request.screenResolutionX = screenResolutionX;
+      request.screenResolutionY = screenResolutionY;
+      request.placeNamePhilips = placeName;
 
       var listings = body.response.listings;
       for (var i = 0; i < listings.length;i++ )
@@ -83,24 +131,14 @@ function makeNestoriaRequest()
        }
 
       //you do need to print print the json, something is going wrong !
-      body = JSON.stringify(body);
-      pullOutLatLng(body);
+      var jsonBody = JSON.stringify(body);
+      //pullOutLatLng(body);
 
-
-  }
-
-    //should be outputted onto the json
-    //console.log(body);
-
-
-//
-//        Loop through each of the values, extract the stuff you need,
-//            and print out onto the json.
-//            Send the values to a div to Pixel Method.
-//            Attached the output back onto thing
-
-
+      callbackWithNestoriaJson(jsonBody);
+    }
 })
+
+
 }
 
 var _divPixelLat;
@@ -149,9 +187,12 @@ function getDivPixelLng()
 
 function pullOutLatLng(body)
 {
+    console.log('storing body');
 	//var obj = JSON.parse(body);
-	createResponse(body);
-	
+	//createResponse(body);
+
+    console.log(body);
+    storeBody = body;
 	//so lets try and replace bedroom max with something else
 	
 	
@@ -162,22 +203,49 @@ function pullOutLatLng(body)
 //translate lat lng to div pixel
 //add div pixel to nestoria output
 
-function createResponse(output)
+function test()
+{
+    console.log('hello');
+}
+
+function listen()
 {
 	var server = http.createServer(function(request, response) {
-			
-			//Write JSON
-			response.writeHead(200, { 'Content-Type': 'application/json' });
 
-			//open loaded tag
-			response.write('jsonCallback(');
-			response.write(output);
-			response.write(');');
-			//response.write('"status_code" : "200"');
-			
-			response.end();
-			
-	}).listen(1337, '127.0.0.1');
+        console.log('lets go!');
+
+        if (request.url === '/favicon.ico') {
+            response.writeHead(200, {'Content-Type': 'image/x-icon'} );
+            response.end();
+            console.log('favicon requested');
+            return;
+        }
+
+        parseParams(request, function(paramsObj){
+
+            console.log(paramsObj.screenResolutionX);
+            console.log(paramsObj.screenResolutionY);
+            console.log(paramsObj.placeName);
+
+            makeNestoriaRequest(paramsObj, function(body){
+
+                console.log(body);
+
+                console.log('write back to browser');
+                response.writeHead(200, { 'Content-Type': 'application/json' });
+
+                //open loaded tag
+                response.write('jsonCallback(');
+
+
+                response.write(body);
+                response.write(');');
+                //response.write('"status_code" : "200"');
+
+                response.end();
+            });
+        });
+    }).listen(1337, '127.0.0.1');
 	
 	console.log("Coord To Div Service Running at http://127.0.0.1:1337/ 0.1");
 }
