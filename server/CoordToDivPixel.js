@@ -37,7 +37,8 @@ function coordToDivPixel(screenResolutionX, screenResolutionY)
 	//difference between 
 	var differenceBetweenLat = southWestLat - northEastLat;
 	var differenceBetweenLng = southWestLng - northEastLng;
-	
+
+    //so item lat would be 0.56666889
 	var itemLatDifferenceFromNWLatBound = itemLat - northEastLat;
 	
 	//lets get the ratio

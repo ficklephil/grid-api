@@ -43,6 +43,12 @@ function parseParams(request,callback){
     paramsObj.screenResolutionX = queryData.screenResolutionX;
     paramsObj.screenResolutionY = queryData.screenResolutionY;
     paramsObj.placeName = queryData.placeName;
+    paramsObj.centerLng = queryData.centerLng;
+    paramsObj.centerLat = queryData.centerLat;
+    paramsObj.lat_lo = queryData.lat_lo;
+    paramsObj.lng_lo = queryData.lng_lo;
+    paramsObj.lat_hi = queryData.lat_hi;
+    paramsObj.lng_hi = queryData.lng_hi;
 
     callback(paramsObj);
 }
@@ -82,7 +88,8 @@ function testWithRequestInJson(){
 //REMEMBER THAT WE'RE SET JSON to TRUE in request
 //ALSO REMEMBER TO TAKE LOADED OUT OF THE REQUEST
 function makeNestoriaRequest(params, callbackWithNestoriaJson){
-    console.log('makeNestoriaRequest with ' + params.placeName + params.screenResolutionX + params.screenResolutionY);
+    //console.log('makeNestoriaRequest with ' + params.placeName + params.screenResolutionX + params.screenResolutionY +
+    //    params.centerLat + params.centerLng);
 
     var item_lat = 51.490994;
     var item_lng = -0.371348;
@@ -91,16 +98,36 @@ function makeNestoriaRequest(params, callbackWithNestoriaJson){
     var screenResolutionY = params.screenResolutionY;
     var placeName = params.placeName.toString();
     //sw
-    var lat_lo = 51.430994;
-    var lng_lo = -0.488156;
+    var lat_lo = params.lat_lo;
+    var lng_lo = params.lng_lo;
 
     //ne
-    var lat_hi = 51.499972;
-    var lng_hi = -0.271348;
+    var lat_hi = params.lat_hi;
+    var lng_hi = params.lng_hi;
+
+    //north east
+//    console.log('lat_hi' + lat_hi);
+//    console.log('lng_hi' + lng_hi);
+//
+//    //south west
+//    console.log('lat_lo' + lat_lo);
+//    console.log('lng_lo' + lng_lo);
 
     //Use a search with Lat Lng bounds and take these
     //and then see the x and y's of divs
-    request({url:'http://api.nestoria.co.uk/api?country=uk&page=1&pretty=1&action=search_listings&place_name='+placeName+'&encoding=json&listing_type=buy&number_of_results=15&property_type=all&bedroom_min=0&bedroom_max=100&price_min=0&price_max=25000000&updated_min=1341378000', json:true}, function (error, response, body) {
+
+
+    var centerLat = params.centerLat;
+    var centerLng = params.centerLng;
+    console.log('centerLat' + centerLat.toString());
+    console.log('centerLng' + centerLng.toString());
+
+    var nestoriaUrl = 'http://api.nestoria.co.uk/api?country=uk&page=1&pretty=1&action=search_listings&centre_point='+centerLat.toString()+','+centerLng.toString()+',0.625mi&encoding=json&listing_type=buy&number_of_results=2&property_type=all&bedroom_min=0&bedroom_max=100&price_min=0&price_max=25000000&updated_min=1341378000';
+    //var url = http://api.nestoria.co.uk/api?country=uk&page=1&pretty=1&action=search_listings&place_name='+placeName+'&encoding=json&listing_type=buy&number_of_results=2&property_type=all&bedroom_min=0&bedroom_max=100&price_min=0&price_max=25000000&updated_min=1341378000
+
+    //console.log('nestoriaUrl : ' + nestoriaUrl);
+
+    request({url:nestoriaUrl, json:true}, function (error, response, body) {
   if (!error && response.statusCode == 200) {
     
     //console.log(body.response.listings);
@@ -126,8 +153,8 @@ function makeNestoriaRequest(params, callbackWithNestoriaJson){
 
           convertCoordToDivPixel(screenResolutionX,screenResolutionY,item_lat,item_lng,lat_lo,lng_lo,lat_hi,lng_hi);
 
-          listings[i].itemMarkerX = Math.round(getDivPixelLat());
-          listings[i].itemMarkerY = Math.round(getDivPixelLng());
+          listings[i].itemMarkerX = Math.round(getDivPixelLng());
+          listings[i].itemMarkerY = Math.round(getDivPixelLat());
        }
 
       //you do need to print print the json, something is going wrong !
@@ -152,24 +179,62 @@ function convertCoordToDivPixel(screenResolutionX,screenResolutionY,item_lat,ite
     //var item_lat = 51.490994;
     //var item_lng = -0.371348;
 
+    //longitude up and down from pole to pole or meridians
+    //parallel to equator are latitude
+
+    console.log('Compare : item_lat' + item_lat);
+    console.log('Compare : item_lng' + item_lng);
+
+    console.log('Compare : lat_hi' + lat_hi);
+    console.log('Compare : lat_lo' + lat_lo);
+
+    console.log('Compare : lng_hi' + lng_hi);
+    console.log('Compare : lng_hi' + lng_lo);
+
+    console.log('Compare : lat_hi - lat_lo'+ (lat_hi - lat_lo));
+    var differenceBetweenLatHiAndLatLo = lat_hi - lat_lo;
+    console.log('Compare : differenceBetweenLatHiAndLatLo'+ differenceBetweenLatHiAndLatLo);
+
+    var findAPercentOfOne = differenceBetweenLatHiAndLatLo / 100;
+    console.log('Compare : findAPercentOfOne'+ findAPercentOfOne);
+
+    var findPixelsPerPercent = screenResolutionY / 100;
+    console.log('Compare : findPixelsPerPercent'+ findPixelsPerPercent);
+
+    var offsetFromLeftLatInLats = item_lat - lat_lo;
+    console.log('Compare : offsetFromLeftLatInLats'+ offsetFromLeftLatInLats);
+
+    //now how many percents in the offset from left
+    var percentsInOffsetFromLeftLat = offsetFromLeftLatInLats/findAPercentOfOne;
+    console.log('Compare : percentsInOffsetFromLeftLat'+ percentsInOffsetFromLeftLat);
+
+    //now times it by the pixels per percent
+    var pixelsOfLat = percentsInOffsetFromLeftLat * findPixelsPerPercent;
+    console.log('Compare : pixelsOfLat'+ pixelsOfLat);
+
+
+
     var differenceBetweenLat = lat_hi - lat_lo;//lat
     var differenceBetweenLng = lng_hi - lng_lo;//lng
 
-    console.log('Difference between Lat : ' + differenceBetweenLat);
-    console.log('Difference between Lng : ' + differenceBetweenLng);
+//    console.log('Difference between Lat : ' + differenceBetweenLat);
+//    console.log('Difference between Lng : ' + differenceBetweenLng);
 
     var itemLatDifferenceFromBound = item_lat - lat_lo;
     var itemLngDifferenceFromBound = item_lng - lng_lo;
 
-    console.log('itemLatDifferenceFromBound' + itemLatDifferenceFromBound);
-    console.log('itemLngDifferenceFromBound' + itemLngDifferenceFromBound);
-
+//    console.log('itemLatDifferenceFromBound' + itemLatDifferenceFromBound);
+//    console.log('itemLngDifferenceFromBound' + itemLngDifferenceFromBound);
+//
+//        console.log('screenResolutionX' + screenResolutionX);
+//        console.log('differenceBetweenLat' + differenceBetweenLat);
+//        console.log('itemLatDifferenceFromBound' + itemLatDifferenceFromBound);
 
     var divPixelLat = (screenResolutionX / differenceBetweenLat) * itemLatDifferenceFromBound;
     var divPixelLng = (screenResolutionY / differenceBetweenLng) * itemLngDifferenceFromBound;
 
-    console.log(divPixelLat);
-    console.log(divPixelLng);
+    console.log('Compare : LatX:' +  pixelsOfLat);
+    console.log('Compare : LngY:' + divPixelLng);
 
     _divPixelLat = divPixelLat;
     _divPixelLng = divPixelLng;
@@ -229,9 +294,9 @@ function listen()
 
             makeNestoriaRequest(paramsObj, function(body){
 
-                console.log(body);
+                //console.log(body);
 
-                console.log('write back to browser');
+                //console.log('write back to browser');
                 response.writeHead(200, { 'Content-Type': 'application/json' });
 
                 //open loaded tag
@@ -247,5 +312,5 @@ function listen()
         });
     }).listen(1337, '127.0.0.1');
 	
-	console.log("Coord To Div Service Running at http://127.0.0.1:1337/ 0.1");
+	console.log("Coord To Div Service Running at http://127.0.0.1:1337/ 0.1 a request is http://127.0.0.1:1337/?screenResolutionX=1939&screenResolutionY=3110&placeName=hounslow");
 }
