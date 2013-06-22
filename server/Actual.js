@@ -153,8 +153,10 @@ function makeNestoriaRequest(params, callbackWithNestoriaJson){
 
           convertCoordToDivPixel(screenResolutionX,screenResolutionY,item_lat,item_lng,lat_lo,lng_lo,lat_hi,lng_hi);
 
-          listings[i].itemMarkerX = Math.round(getDivPixelLng());
-          listings[i].itemMarkerY = Math.round(getDivPixelLat());
+          //Longitude is X, Latitude is Y
+
+          listings[i].longitudeXCoor = Math.round(getDivPixelLng());
+          listings[i].latitudeYCoor = Math.round(getDivPixelLat());
        }
 
       //you do need to print print the json, something is going wrong !
@@ -173,71 +175,28 @@ var _divPixelLng;
 
 function convertCoordToDivPixel(screenResolutionX,screenResolutionY,item_lat,item_lng,lat_lo,lng_lo,lat_hi,lng_hi)
 {
-    //var screenResolutionX = 1000;
-    //var screenResolutionY = 700;
+    var latitudePixelsFromTop = screenResolutionY - calcLatOrLngInPixels(screenResolutionY,lat_hi,lat_lo,item_lat);
+    var longitudePixels = calcLatOrLngInPixels(screenResolutionX,lng_hi,lng_lo,item_lng);
 
-    //var item_lat = 51.490994;
-    //var item_lng = -0.371348;
+    _divPixelLat = latitudePixelsFromTop;
+    _divPixelLng = longitudePixels;
+}
 
-    //longitude up and down from pole to pole or meridians
-    //parallel to equator are latitude
-
-    console.log('Compare : item_lat' + item_lat);
-    console.log('Compare : item_lng' + item_lng);
-
-    console.log('Compare : lat_hi' + lat_hi);
-    console.log('Compare : lat_lo' + lat_lo);
-
-    console.log('Compare : lng_hi' + lng_hi);
-    console.log('Compare : lng_hi' + lng_lo);
-
-    console.log('Compare : lat_hi - lat_lo'+ (lat_hi - lat_lo));
-    var differenceBetweenLatHiAndLatLo = lat_hi - lat_lo;
-    console.log('Compare : differenceBetweenLatHiAndLatLo'+ differenceBetweenLatHiAndLatLo);
-
-    var findAPercentOfOne = differenceBetweenLatHiAndLatLo / 100;
-    console.log('Compare : findAPercentOfOne'+ findAPercentOfOne);
-
-    var findPixelsPerPercent = screenResolutionY / 100;
-    console.log('Compare : findPixelsPerPercent'+ findPixelsPerPercent);
-
-    var offsetFromLeftLatInLats = item_lat - lat_lo;
-    console.log('Compare : offsetFromLeftLatInLats'+ offsetFromLeftLatInLats);
-
-    //now how many percents in the offset from left
-    var percentsInOffsetFromLeftLat = offsetFromLeftLatInLats/findAPercentOfOne;
-    console.log('Compare : percentsInOffsetFromLeftLat'+ percentsInOffsetFromLeftLat);
-
-    //now times it by the pixels per percent
-    var pixelsOfLat = percentsInOffsetFromLeftLat * findPixelsPerPercent;
-    console.log('Compare : pixelsOfLat'+ pixelsOfLat);
-
-
-
-    var differenceBetweenLat = lat_hi - lat_lo;//lat
-    var differenceBetweenLng = lng_hi - lng_lo;//lng
-
-//    console.log('Difference between Lat : ' + differenceBetweenLat);
-//    console.log('Difference between Lng : ' + differenceBetweenLng);
-
-    var itemLatDifferenceFromBound = item_lat - lat_lo;
-    var itemLngDifferenceFromBound = item_lng - lng_lo;
-
-//    console.log('itemLatDifferenceFromBound' + itemLatDifferenceFromBound);
-//    console.log('itemLngDifferenceFromBound' + itemLngDifferenceFromBound);
-//
-//        console.log('screenResolutionX' + screenResolutionX);
-//        console.log('differenceBetweenLat' + differenceBetweenLat);
-//        console.log('itemLatDifferenceFromBound' + itemLatDifferenceFromBound);
-
-    var divPixelLat = (screenResolutionX / differenceBetweenLat) * itemLatDifferenceFromBound;
-    var divPixelLng = (screenResolutionY / differenceBetweenLng) * itemLngDifferenceFromBound;
-
-    console.log('Compare : LatX:' +  pixelsOfLat);
-    console.log('Compare : LngY:' + divPixelLng);
-
-    _divPixelLat = divPixelLat;
-    _divPixelLng = divPixelLng;
+/**
+ * Calculates the Latitude or Longitude in Pixels
+ * depending on the screen resolution, and high and low values in this case
+ * the high and low values being the latitude/longitude high and latitude/longitude low
+ *
+ * @inputs screenResolution a screen resolution either x or y ie. 1024
+ * high value ie. latitude high ie. lat_hi from the NE bound
+ * low value ie. latitude low ie. lat_lo from the SW bound
+ * item value ie. latitude of the item
+ * @return Number ie. pixels
+ */
+function calcLatOrLngInPixels(screenResolution,highValue,lowValue,itemValue){
+    var ratioLatitudeToPixel = screenResolution / (highValue - lowValue);
+    var itemsLatitudeRelativeToBottom = itemValue - lowValue;
+    return itemsLatitudeRelativeToBottom * ratioLatitudeToPixel;
 }
 
 function getDivPixelLat()
