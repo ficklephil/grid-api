@@ -49,6 +49,10 @@ function parseParams(request,callback){
     paramsObj.lng_lo = queryData.lng_lo;
     paramsObj.lat_hi = queryData.lat_hi;
     paramsObj.lng_hi = queryData.lng_hi;
+    paramsObj.page = queryData.page;
+    paramsObj.min_price = queryData.min_price;
+    paramsObj.max_price = queryData.max_price;
+    paramsObj.updated_min = queryData.updated_min;
 
     callback(paramsObj);
 }
@@ -119,10 +123,15 @@ function makeNestoriaRequest(params, callbackWithNestoriaJson){
 
     var centerLat = params.centerLat;
     var centerLng = params.centerLng;
+    var page = params.page;
+    var min_price = params.min_price;
+    var max_price = params.max_price;
+    var updated_min = params.updated_min;
+
     console.log('centerLat' + centerLat.toString());
     console.log('centerLng' + centerLng.toString());
 
-    var nestoriaUrl = 'http://api.nestoria.co.uk/api?country=uk&page=1&pretty=1&action=search_listings&centre_point='+centerLat.toString()+','+centerLng.toString()+',0.625mi&encoding=json&listing_type=buy&number_of_results=2&property_type=all&bedroom_min=0&bedroom_max=100&price_min=0&price_max=25000000&updated_min=1341378000';
+    var nestoriaUrl = 'http://api.nestoria.co.uk/api?country=uk&page='+page.toString()+'&pretty=1&action=search_listings&centre_point='+centerLat.toString()+','+centerLng.toString()+',0.625mi&encoding=json&listing_type=buy&number_of_results=15&property_type=all&bedroom_min=0&bedroom_max=100&price_min='+min_price+'&price_max='+max_price+'&updated_min='+updated_min;
     //var url = http://api.nestoria.co.uk/api?country=uk&page=1&pretty=1&action=search_listings&place_name='+placeName+'&encoding=json&listing_type=buy&number_of_results=2&property_type=all&bedroom_min=0&bedroom_max=100&price_min=0&price_max=25000000&updated_min=1341378000
 
     //console.log('nestoriaUrl : ' + nestoriaUrl);
@@ -143,22 +152,24 @@ function makeNestoriaRequest(params, callbackWithNestoriaJson){
       request.placeNamePhilips = placeName;
 
       var listings = body.response.listings;
-      for (var i = 0; i < listings.length;i++ )
+      if(listings)
       {
-         // console.log(listings[i].longitude);
-          //console.log(listings[i].latitude);
+          for (var i = 0; i < listings.length;i++ )
+          {
+             // console.log(listings[i].longitude);
+              //console.log(listings[i].latitude);
 
-          item_lat = listings[i].latitude;
-          item_lng = listings[i].longitude;
+              item_lat = listings[i].latitude;
+              item_lng = listings[i].longitude;
 
-          convertCoordToDivPixel(screenResolutionX,screenResolutionY,item_lat,item_lng,lat_lo,lng_lo,lat_hi,lng_hi);
+              convertCoordToDivPixel(screenResolutionX,screenResolutionY,item_lat,item_lng,lat_lo,lng_lo,lat_hi,lng_hi);
 
-          //Longitude is X, Latitude is Y
+              //Longitude is X, Latitude is Y
 
-          listings[i].longitudeXCoor = Math.round(getDivPixelLng());
-          listings[i].latitudeYCoor = Math.round(getDivPixelLat());
-       }
-
+              listings[i].longitudeXCoor = Math.round(getDivPixelLng());
+              listings[i].latitudeYCoor = Math.round(getDivPixelLat());
+           }
+      }
       //you do need to print print the json, something is going wrong !
       var jsonBody = JSON.stringify(body);
       //pullOutLatLng(body);
