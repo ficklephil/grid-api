@@ -109,6 +109,7 @@ function makeNestoriaRequest(params, callbackWithNestoriaJson){
     var lat_hi = params.lat_hi;
     var lng_hi = params.lng_hi;
 
+console.log('hello');
     //north east
 //    console.log('lat_hi' + lat_hi);
 //    console.log('lng_hi' + lng_hi);
